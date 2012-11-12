@@ -1,0 +1,28 @@
+<%
+  # Fix this to https when SSL certs are working in dev and staging
+  protocol = (properties.login && properties.login.protocol) ? properties.login.protocol : "http"
+%>
+---
+cloud_controller_uri: api.<%= properties.domain%>
+service:
+  name: oauth2
+  version: "1.0"
+  description: 'OAuth2 service'
+  plans: ['free']
+  default_plan: 'free'
+  tags: ['oauth2','uaa']
+  timeout: 60
+  supported_versions: ["1.0"]
+  version_aliases:
+    current: "1.0"
+  uaa: <%= protocol %>://uaa.<%= properties.domain %>
+  login: <%= protocol %>://login.<%= properties.domain %>
+  client_secret: <%= (properties.uaa.clients && properties.uaa.clients.kernelauth) ? properties.uaa.clients.kernelauth.secret ? 0xdeadbeef %>
+index: 0
+port: 59384
+mbus: nats://<%= properties.nats.user %>:<%= properties.nats.password %>@<%= properties.nats.address %>:<%= properties.nats.port %>
+logging:
+  file: /var/vcap/sys/log/oauth2-service/oauth2-service.log
+  level: debug
+pid: /var/vcap/sys/run/oauth2-service/oauth2-service.pid
+token: <%= (properties.uaa.service && properties.uaa.service.token) ? properties.uaa.service.token : 0xdeadbeef %>

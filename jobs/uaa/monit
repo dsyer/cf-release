@@ -9,3 +9,10 @@ check process vcap_registrar
   start program "/var/vcap/jobs/uaa/bin/vcap_registrar_ctl start"
   stop program "/var/vcap/jobs/uaa/bin/vcap_registrar_ctl stop"
   group vcap
+
+check process oauth2-service
+  with pidfile /var/vcap/sys/run/uaa/oauth2-service.pid
+  start program "/var/vcap/jobs/uaa/bin/oauth2-service_ctl start"
+  stop program "/var/vcap/jobs/uaa/bin/oauth2-service_ctl stop"
+  group vcap
+

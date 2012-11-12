@@ -1,0 +1,45 @@
+#!/bin/bash -e
+
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+RUN_DIR=/var/vcap/sys/run/oauth2-service
+LOG_DIR=/var/vcap/sys/log/oauth2-service
+JOB_DIR=/var/vcap/jobs/oauth2-service
+PIDFILE=$RUN_DIR/oauth2-service.pid
+
+source /var/vcap/packages/common/utils.sh
+
+case $1 in
+
+  start)
+    pid_guard $PIDFILE "OAuth2 Service"
+
+    mkdir -p $RUN_DIR
+    mkdir -p $LOG_DIR
+
+    echo $$ > $PIDFILE
+
+    <% if properties.syslog_aggregator %>
+    /var/vcap/packages/syslog_aggregator/setup_syslog_forwarder.sh $JOB_DIR/config
+    <% end %>
+
+    export CONFIG_FILE=/var/vcap/jobs/uaa/config/oauth2-service/config.yml
+
+    cd /var/vcap/packages/uaa/oauth2-service
+    exec /var/vcap/packages/ruby/bin/ruby \
+         /var/vcap/packages/uaa/oauth2-service/bin/oauth2-gateway \
+         -c $CONFIG_FILE \
+         >>$LOG_DIR/oauth2-service.stdout.log \
+         2>>$LOG_DIR/oauth2-service.stderr.log
+
+    ;;
+
+  stop)
+    kill_and_wait $PIDFILE
+
+    ;;
+
+  *)
+    echo "Usage: oauth2-service_ctl {start|stop}" ;;
+
+esac
+exit 0

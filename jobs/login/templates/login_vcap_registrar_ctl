@@ -3,14 +3,14 @@
 export PATH=/var/vcap/packages/ruby/bin:$PATH
 RUN_DIR=/var/vcap/sys/run/vcap_registrar
 LOG_DIR=/var/vcap/sys/log/vcap_registrar
-PIDFILE=$RUN_DIR/vcap_registrar.pid
+PIDFILE=$RUN_DIR/login_vcap_registrar.pid
 
 source /var/vcap/packages/common/utils.sh
 
 case $1 in
 
   start)
-    pid_guard $PIDFILE "VCAP registrar"
+    pid_guard $PIDFILE "VCAP registrar for Login Server"
 
     mkdir -p $RUN_DIR
     mkdir -p $LOG_DIR
@@ -24,8 +24,8 @@ case $1 in
          /var/vcap/packages/login/vcap_registrar/bin/vcap_registrar \
          --register_with_router \
          --register_varz_credentials \
-         >>$LOG_DIR/vcap_registrar.stdout.log \
-         2>>$LOG_DIR/vcap_registrar.stderr.log
+         >>$LOG_DIR/login_vcap_registrar.stdout.log \
+         2>>$LOG_DIR/login_vcap_registrar.stderr.log
 
     ;;
 
@@ -35,7 +35,7 @@ case $1 in
     ;;
 
   *)
-    echo "Usage: vcap_registrar_ctl {start|stop}" ;;
+    echo "Usage: login_vcap_registrar_ctl {start|stop}" ;;
 
 esac
 exit 0
